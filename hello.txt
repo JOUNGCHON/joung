@@ -9,3 +9,5 @@ testupdate2
 ee
 
 바나나
+
+사과
