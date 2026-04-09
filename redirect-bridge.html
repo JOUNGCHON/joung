@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OAuth Redirect Bridge</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#111; color:#eee; margin:0; padding:24px; }
+    .card { max-width:720px; margin:0 auto; background:#1b1b1b; border:1px solid #333; border-radius:12px; padding:20px; }
+    code { background:#2a2a2a; padding:2px 6px; border-radius:6px; }
+    .ok { color:#7dffa1; }
+    .warn { color:#ffd37d; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>OAuth 처리 중...</h2>
+    <p id="status">토큰을 앱으로 전달하고 있습니다.</p>
+    <p class="warn">자동 이동이 안 되면 브라우저 주소창의 URL을 복사해 Unity 로그로 확인하세요.</p>
+  </div>
+
+  <script>
+    (function () {
+      // target 쿼리 파라미터(최종 딥링크)를 받습니다.
+      // 예: https://example.com/redirect-bridge.html?target=mygame%3A%2F%2Fauth-callback
+      const qs = new URLSearchParams(window.location.search);
+      const target = qs.get("target") || "mygame://auth-callback";
+
+      // Supabase OAuth는 토큰을 보통 hash fragment로 반환합니다.
+      // 이를 query 형태로 바꿔 Unity 딥링크로 전달합니다.
+      const hash = window.location.hash ? window.location.hash.substring(1) : "";
+      const query = window.location.search ? window.location.search.substring(1) : "";
+
+      // hash 우선(토큰 포함), 없으면 query 사용
+      const payload = hash || query;
+      const separator = target.includes("?") ? "&" : "?";
+      const finalUrl = payload ? (target + separator + payload) : target;
+
+      const statusEl = document.getElementById("status");
+      statusEl.innerHTML = "<span class='ok'>앱으로 이동 시도:</span> <code>" + finalUrl + "</code>";
+
+      // 딥링크 이동 시도
+      window.location.replace(finalUrl);
+    })();
+  </script>
+</body>
+</html>
